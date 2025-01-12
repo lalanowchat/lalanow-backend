@@ -22,4 +22,4 @@ app = FastAPI(
 )
 
 
-app.include_router(resources_nearby.router)
+app.include_router(resources.router)
