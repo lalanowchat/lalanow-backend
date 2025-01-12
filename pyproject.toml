@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "lalanow-backend"
+version = "0.1.0"
+description = "The backend of LALA Now Chatbot "
+authors = ["Your Name <your.email@example.com>"]
+license = "AGPL-3.0-or-later"
+readme = "README.md"
+packages = [{ include = "app" }]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)"
+]
+
+[tool.poetry.dependencies]
+fastapi = "^0.115.0"
+gunicorn = "^22.0.0"
+httpx = "^0.26.0"
+python = "~3.10"
+python-dotenv = "^1.0.0"
+uvicorn = "^0.27.0"
+
+# Needed for ORM layer
+Django = "==4.2.6"
+django-environ = "*"
+django-stubs = "==4.2.6"
+pandas = "*"
+psycopg2-binary = "==2.9.9"
+python-dateutil = "==2.8.2"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "*"
+pytest-dotenv = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
