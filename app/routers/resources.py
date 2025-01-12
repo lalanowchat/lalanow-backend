@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Request
 from starlette import status
 
-from app.schemas.resources_nearby import (
-    ResourcesNearbyResponseSchema
+from app.schemas.resources import (
+    ResourcesListResponseSchema
 )
 
-router = APIRouter(prefix="/resources-nearby", tags=["resources-nearby"])
+router = APIRouter(prefix="/resources", tags=["resources"])
 
 
 @router.get(
     "/list",
-    response_model=ResourcesNearbyResponseSchema,
+    response_model=ResourcesListResponseSchema,
 )
-def resources_nearby(request: Request):
+def resources_list(request: Request):
     return {
         "resources": [
             {

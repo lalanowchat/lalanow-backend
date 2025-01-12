@@ -4,7 +4,7 @@ from importlib.metadata import version
 
 from app.constants import IS_DEPLOYED
 from app.dependencies import get_api_key
-from app.routers import resources_nearby
+from app.routers import resources
 
 
 load_dotenv(".env")

@@ -7,6 +7,6 @@ class ResourceSchema(BaseModel):
     name: str
     address: Optional[str]
 
-class ResourcesNearbyResponseSchema(BaseModel):
+class ResourcesListResponseSchema(BaseModel):
     resources: List[ResourceSchema]
 
