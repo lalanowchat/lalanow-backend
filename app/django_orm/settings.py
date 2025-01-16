@@ -16,4 +16,4 @@ DATABASES = {"default": env.db()}
 # see: https://docs.djangoproject.com/en/4.2/ref/databases/#connection-management
 CONN_HEALTH_CHECKS = True
 CONN_MAX_AGE = 20  # I believe the default Postgres timeout is 30 seconds
-INSTALLED_APPS = ["app.django_orm.content.config.DjangoConfig"]
+INSTALLED_APPS = ["app.django_orm.content.config.DjangoConfig", 'django_extensions']
