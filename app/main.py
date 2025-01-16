@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from importlib.metadata import version
 
 from app.constants import IS_DEPLOYED
@@ -21,5 +22,12 @@ app = FastAPI(
     description="The Backend of LALA Now Chatbot",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 app.include_router(resources.router)
