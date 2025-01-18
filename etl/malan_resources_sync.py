@@ -1,15 +1,34 @@
 import pandas as pd
+import time
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 
 from app.django_orm import utils
-from app.django_orm.content.models import MALANRawResource
+from app.django_orm.content.models import MALANRawResource, NeedHelpResource
+from app.constants import NEED_HELP_CATEGORIES
 
 utils.ensure_django()
 
 GOOGLE_SHEET_ID = "1KMk34XY5dsvVJjAoD2mQUVHYU_Ib6COz6jcGH5uJWDY"
 
+def get_coordinates(address):
+    try:
+        geolocator = Nominatim(user_agent="lalachatresponder@gmail.com")
+        location = geolocator.geocode(address)
+        if location:
+            latitude = location.latitude
+            longitude = location.longitude
+            return latitude, longitude
+        else:
+            return None, None
+    except (GeocoderTimedOut, Exception):
+        # If geocoding fails, continue without coordinates
+        return None, None
+
 def malan_resources_sync():
 
     MALANRawResource.objects.all().delete()
+    NeedHelpResource.objects.all().delete()
 
     df = pd.read_csv(
         f"https://docs.google.com/spreadsheets/d/{GOOGLE_SHEET_ID}/export?format=csv&id={GOOGLE_SHEET_ID}&gid=0", skiprows=2
@@ -19,7 +38,7 @@ def malan_resources_sync():
     df = df.dropna(how='all')
     df = df[df['Closed']!=1.0]
 
-    resources = []
+
     for i, row in df.iterrows():
         res = MALANRawResource(
                 location=row.get('Location'),
@@ -36,10 +55,24 @@ def malan_resources_sync():
                 closed=(True if row.get('Closed', False) == 1.0 else False),
                 link=row.get('LINK (DO NOT HYPERLINK)'),
         )
-
-        resources.append(res)
-
-    MALANRawResource.objects.bulk_create(resources)
+        if (row.get('Address'), str) and isinstance(row.get('Aid Type'), str):
+            latitude, longitude = get_coordinates(row.get('Address'))
+            categories = row.get('Aid Type',"").split(",")
+            for category in categories: 
+                category = category.strip()
+                if category in NEED_HELP_CATEGORIES:
+                    nh_resource = NeedHelpResource(
+                        name=res.name,
+                        address=res.address,
+                        providing=res.providing,
+                        lat=latitude,
+                        long=longitude,
+                        aid_type=category,
+                        last_updated=res.last_updated,
+                    )
+                    nh_resource.save()
+            time.sleep(1)
+        res.save()
 
 
 if __name__ == "__main__":

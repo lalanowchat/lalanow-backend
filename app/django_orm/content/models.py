@@ -24,6 +24,26 @@ class MALANRawResource(models.Model):
     closed = models.BooleanField(null=True, blank=True)
     link = models.TextField(null=True, blank=True)
 
+class NeedHelpResource(models.Model):
+    name = models.TextField(null=True, blank=True)
+    aid_type = models.TextField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    lat = models.FloatField(null=True, blank=True)
+    long = models.FloatField(null=True, blank=True)
+    providing = models.TextField(null=True, blank=True)
+    last_updated = models.TextField(null=True, blank=True)
+
+class WantToHelpResource(models.Model):
+    name = models.TextField(null=True, blank=True)
+    aid_type = models.TextField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    lat = models.FloatField(null=True, blank=True)
+    long = models.FloatField(null=True, blank=True)
+    volunteers_needs = models.TextField(null=True, blank=True)
+    accepting = models.TextField(null=True, blank=True)
+    last_updated = models.TextField(null=True, blank=True)
+
+
 
 # class need_help(models.Model):
 #     id = models.BigIntegerField(primary_key=True)           #primary key of table
