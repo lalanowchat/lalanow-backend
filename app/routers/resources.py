@@ -3,10 +3,6 @@ from starlette import status
 from typing import List, Optional
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
-
-from app.schemas.resources import (
-    ResourcesListResponseSchema
-)
 from app.django_orm.content.models import MALANRawResource, NeedHelpResource
 from app.django_orm.content.db_utils import execute_custom_query
 from app.constants import NEED_HELP_CATEGORIES
@@ -16,17 +12,24 @@ router = APIRouter(prefix="/resources", tags=["resources"])
 
 
 @router.get(
-    "/list",
-    response_model=ResourcesListResponseSchema,
+    "/all",
 )
 def resources_list(request: Request):
+    resources = MALANRawResource.objects.all().values(
+        'name',
+        'location',
+        'last_updated',
+        'name',
+        'aid_type',
+        'address',
+        'volunteers_needs',
+        'accepting',
+        'providing',
+        'notes'
+    )
+
     return {
-        "resources": [
-            {
-                "name": "Lanark Recreation Center",
-                "address": "21816 Lanark St, Canoga Park, CA 91304, USA"
-            }
-        ]
+        "resources": list(resources)
     }
 
 
@@ -60,11 +63,13 @@ def need_help_categories(request: Request):
 )
 def need_help(
     request: Request,
-    category: str = Query(..., description="Category of help needed"),
+    category: Optional[str] = Query(default=None, description="Category of help needed"),
     location: Optional[str] = Query(default=None, description="Location to search for resources"),
+    all: Optional[bool] = Query(default=False, desription="Returns all the need-help resources is true")
 ):
-
-    if location is None or location == "":
+    if all:
+        resources = NeedHelpResource.objects.all().values('name', 'address', 'providing', 'aid_type')
+    elif location is None or location == "":
         resources = MALANRawResource.objects.filter(
             aid_type=category,
         ).values('name', 'address', 'providing')

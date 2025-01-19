@@ -7,6 +7,3 @@ class ResourceSchema(BaseModel):
     name: str
     address: Optional[str]
 
-class ResourcesListResponseSchema(BaseModel):
-    resources: List[ResourceSchema]
-
