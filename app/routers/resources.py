@@ -91,6 +91,7 @@ def need_help_by_zip(
     request: Request,
     category: str = Query(..., description="Category of help needed"),
     zipcode: str = Query(..., description="ZIP code to search near"),
+    pagesize: int = Query(10, description="Number of results to return (default: 10)"),
 ):
     # Get coordinates for the ZIP code
     geolocator = Nominatim(user_agent="lalachatresponder@gmail.com")
@@ -133,7 +134,7 @@ def need_help_by_zip(
             AND lat IS NOT NULL 
             AND long IS NOT NULL
         ORDER BY distance 
-        LIMIT 10;
+        LIMIT {pagesize};
     """
 
     resources = execute_custom_query(query)    
