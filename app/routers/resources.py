@@ -118,6 +118,8 @@ def need_help_by_zip(
             aid_type,
             address,
             providing,
+            long,
+            lat,
             (
                 3959 * acos(
                     cos(radians({search_lat})) * 
