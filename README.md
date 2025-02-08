@@ -5,16 +5,18 @@
 LALA now is a chatbot that provides information to those affected by Los Angeles Wildfires and people willing to assist.
 
 ## Local Development Set up
+
 You should have Python 3.10 installed on your system.
 
 ### Create an .env file.
+
 ```bash
 cp .env-example .env
 ```
 
-The `API_ENV` environmental variable determines whether the API requires an `API_KEY` to validate requests.  When set to either `staging` or `production`, the token is necessary.  Otherwise, it is not necessary.
+The `API_ENV` environmental variable determines whether the API requires an `API_KEY` to validate requests. When set to either `staging` or `production`, the token is necessary. Otherwise, it is not necessary.
 
-The `DATABASE_URL` is required.  The `.env-example` has a reference to a local postgres database.
+The `DATABASE_URL` is required. The `.env-example` has a reference to a local postgres database.
 
 ```bash
 API_KEY=
@@ -23,7 +25,9 @@ DATABASE_URL="postgresql://postgres:password@postgres:5432/postgres"
 ```
 
 ### Run the application manually
+
 Set up a virtual environment.
+
 ```bash
 python -m virtualenv .venv
 
@@ -31,34 +35,41 @@ source .venv/bin/activate
 ```
 
 Install Python dependencies.
+
 ```bash
 python -m pip install --upgrade pip poetry
 ```
 
 Install the API-specific dependencies.
+
 ```bash
 python -m poetry install
 ```
-Start the application.  You can add the `--reload` flag to this command to restart the server upon saving the app.
+
+Start the application. You can add the `--reload` flag to this command to restart the server upon saving the app.
+
 ```bash
 gunicorn app.main:app --worker-class uvicorn.workers.UvicornWorker
 ```
 
 On Windows, you can run the app using `uvicorn`:
+
 ```bash
 uvicorn app.main:app --host 127.0.0.1 --reload
 ```
 
-
 ### Interact with the ORM layer
-You can interact with the ORM layer directly using regular Django commands, as well as custom Django commands.  
+
+You can interact with the ORM layer directly using regular Django commands, as well as custom Django commands.
 
 #### View available commands
+
 ```bash
 python -m app help
 ```
 
 #### Create/Update database
+
 ```bash
 # Create new migrations if you added/updated models
 python -m app makemigrations
@@ -66,12 +77,13 @@ python -m app migrate
 ```
 
 ### Run Tests
+
 ```bash
 pytest
 ```
 
-
 ## Directory Structure
+
 ```bash
 ├── lalanow-backend
 │   ├── .github # CICD workflow files that run in GitHub
@@ -99,4 +111,5 @@ pytest
 │   │   ├── flow_copy.py # Holds static, non-LLM copy for flows, like greetings or follow-ups
 ├── CHANGELOG.md
 ├── pyproject.toml # Project settings and dependencies
+
 ```
