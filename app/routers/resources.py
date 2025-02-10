@@ -91,7 +91,7 @@ def need_help_by_zip(
     request: Request,
     category: str = Query(..., description="Category of help needed"),
     zipcode: str = Query(..., description="ZIP code to search near"),
-    pagesize: int = Query(10, description="Number of results to return (default: 10)"),
+    pagesize: int = Query(50, description="Number of results to return (default: 50)"),
 ):
     # Get coordinates for the ZIP code
     geolocator = Nominatim(user_agent="lalachatresponder@gmail.com")
@@ -135,6 +135,72 @@ def need_help_by_zip(
             and address != 'nan'
             AND lat IS NOT NULL 
             AND long IS NOT NULL
+        ORDER BY distance 
+        LIMIT {pagesize};
+    """
+
+    resources = execute_custom_query(query)    
+
+    return {
+        "resources": resources
+    }
+
+   
+@router.get(
+    "/want-to-help/by-zip",
+    status_code=status.HTTP_200_OK,
+)
+def need_help_by_zip(
+    request: Request,
+    category: str = Query(..., description="Category of help needed"),
+    zipcode: str = Query(..., description="ZIP code to search near"),
+    pagesize: int = Query(50, description="Number of results to return (default: 50)"),
+):
+    # Get coordinates for the ZIP code
+    geolocator = Nominatim(user_agent="lalachatresponder@gmail.com")
+    try:
+        location = geolocator.geocode(f"{zipcode}, USA")
+        if not location:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Could not find coordinates for ZIP code {zipcode}"
+            )
+        search_lat = location.latitude
+        search_long = location.longitude
+    except GeocoderTimedOut:
+        raise HTTPException(
+            status_code=503,
+            detail="Geocoding service timed out"
+        )
+
+    # Create raw SQL query using PostGIS
+
+    query = f"""
+        SELECT 
+            a.name,
+            a.aid_type,
+            a.address,
+            b.volunteers_needs,
+            a.long,
+            a.lat,
+            (
+                3959 * acos(
+                    cos(radians({search_lat})) * 
+                    cos(radians(lat)) * 
+                    cos(radians(long) - radians({search_long})) + 
+                    sin(radians({search_lat})) * 
+                    sin(radians(lat))
+                )
+            ) AS distance
+        FROM app_django_orm_needhelpresource a, public.app_django_orm_malanrawresource b
+        WHERE 
+            a.name = b.name
+	        and a.address = b.address
+	        and b.volunteers_needs != 'nan'
+            and a.aid_type = '{category}'
+            and a.address != 'nan'
+            AND a.lat IS NOT NULL 
+            AND a.long IS NOT NULL
         ORDER BY distance 
         LIMIT {pagesize};
     """
